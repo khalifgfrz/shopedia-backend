@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
+  name       String?
+  username   String?
+  phone      String?
+  address    String?
+  gender     String?
+  image      String?
+  role       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  orders    Order[]
+  carts     Cart[]
+}
+
+model Product {
+  id          String      @id @default(uuid())
+  name        String
+  description String
+  price       Float
+  stock       Float
+  image       String?
+  categories  Category[]  @relation("ProductCategories")
+  created_at  DateTime    @default(now())
+  updated_at  DateTime    @updatedAt
+  is_deleted  Boolean     @default(false)
+  items       OrderItem[]
+  carts       Cart[]
+
+}
+
+model Category {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  products   Product[]    @relation("ProductCategories")
+}
+
+model Order {
+  id          String     @id @default(uuid())
+  userId      Int
+  subtotal    Float
+  tax         Float
+  shippingCost Float
+  paymentId   Int
+  deliveryId  Int
+  status      String
+  grandTotal  Float
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  payment     Payment    @relation(fields: [paymentId], references: [id])
+  delivery    Delivery   @relation(fields: [deliveryId], references: [id])
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id         Int     @id @default(autoincrement())
+  orderId    String
+  productId  String
+  qty        Int
+  order      Order   @relation(fields: [orderId], references: [id])
+  product    Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  orders     Order[]
+}
+
+model Delivery {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  cost       Float
+  orders     Order[]
+}
+
+model Cart {
+  id          String     @id @default(uuid())
+  userId      Int
+  productId   String
+  qty         Int
+  price       Int
+  user        User       @relation(fields: [userId], references: [id])
+  product     Product    @relation(fields: [productId], references: [id])
+}
