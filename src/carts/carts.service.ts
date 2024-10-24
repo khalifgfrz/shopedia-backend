@@ -24,9 +24,7 @@ export class CartsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Product with ID ${data.productId} not found`,
-      );
+      throw new NotFoundException(`Product not found`);
     }
 
     const cartItem = await this.prismaService.cart.create({
@@ -47,14 +45,14 @@ export class CartsService {
         where: { userId: userId },
       });
       if (carts.length === 0) {
-        throw new NotFoundException('No carts found for this user');
+        throw new NotFoundException('No products found for this user');
       }
 
       return carts.map((cart) => ({
         ...cart,
       }));
     } catch (err) {
-      throw new NotFoundException('Cart not found');
+      throw new NotFoundException('Product not found');
     }
   }
 
@@ -69,16 +67,30 @@ export class CartsService {
         );
       }
 
-      const order = await this.prismaService.cart.update({
+      const cart = await this.prismaService.cart.update({
         where: { id: cartId },
         data: {
           qty: data.qty,
         },
       });
-      return order;
+      return cart;
     } catch (err) {
       if (err.code === 'P2025') {
-        throw new NotFoundException('User not found.');
+        throw new NotFoundException('Product not found.');
+      }
+      throw err;
+    }
+  }
+
+  async deleteCart(cartId: string) {
+    try {
+      const cart = await this.prismaService.cart.delete({
+        where: { id: cartId },
+      });
+      return cart;
+    } catch (err) {
+      if (err.code === 'P2025') {
+        throw new NotFoundException(`Product not found.`);
       }
       throw err;
     }

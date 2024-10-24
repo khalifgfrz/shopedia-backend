@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,5 +44,12 @@ export class CartsController {
   ) {
     const updatedCart = await this.cartsService.updateCart(cartId, request);
     return { message: 'Update Success', data: updatedCart };
+  }
+
+  @Delete(':cartId')
+  @UseGuards(JwtAuthGuard)
+  async deleteCart(@Param('cartId') cartId: string) {
+    const deletedCart = await this.cartsService.deleteCart(cartId);
+    return { message: 'Delete Success', data: deletedCart };
   }
 }
