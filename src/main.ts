@@ -11,8 +11,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.use(cookieParser());
   app.enableCors({
-    origin: 'http://localhost:3000',
-    methods: 'GET,POST,PUT,DELETE',
+    origin: '*',
+    methods: '*',
     credentials: true,
   });
   await app.listen(app.get(ConfigService).getOrThrow('PORT'));
