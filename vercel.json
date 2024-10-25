@@ -3,16 +3,10 @@
   "installCommand": "pnpm install",
   "buildCommand": "pnpm build",
   "functions": {
-    "api/*.ts": {
+    "api/**/*.ts": {
       "runtime": "nodejs16.x"
     }
   },
-  "builds": [
-    {
-      "src": "dist/main.js",
-      "use": "@vercel/node"
-    }
-  ],
   "outputDirectory": "dist",
   "rewrites": [
     {
