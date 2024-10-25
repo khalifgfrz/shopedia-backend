@@ -44,17 +44,30 @@ export class ProductsController {
   @Get()
   async getProducts(
     @Query('page') page: number = 1,
-    @Query('categoryId') categoryId?: string,
+    @Query('categoryName') categoryNames?: string[], // Accepts an array of category names
     @Query('sort') sort?: 'asc' | 'desc' | 'latest' | 'oldest',
     @Query('search') search?: string,
   ) {
-    const getProducts = await this.productsService.getProducts({
-      page,
-      categoryId,
-      sort,
-      search,
-    });
-    return { message: 'Get Data Success', data: getProducts };
+    const { currentPage, totalPages, totalProducts, products } =
+      await this.productsService.getProducts({
+        page,
+        categoryNames: categoryNames
+          ? Array.isArray(categoryNames)
+            ? categoryNames
+            : [categoryNames]
+          : [], // Ensure it's an array
+        sort,
+        search,
+      });
+    return {
+      message: 'Get Data Success',
+      pagination: {
+        currentPage,
+        totalPages,
+        totalProducts,
+      },
+      data: products,
+    };
   }
 
   @Get(':productId')

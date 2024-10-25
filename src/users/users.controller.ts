@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -24,6 +25,7 @@ import {
 
 @Controller('users')
 export class UsersController {
+  private readonly logger = new Logger(UsersController.name);
   constructor(
     private readonly usersService: UsersService,
     private readonly cloudinaryService: CloudinaryService,
@@ -31,6 +33,7 @@ export class UsersController {
 
   @Post('register')
   async createUser(@Body() request: CreateUserRequest) {
+    this.logger.log(`Creating user with data: ${JSON.stringify(request)}`);
     await this.usersService.createUser(request);
     return { message: 'Register Success' };
   }

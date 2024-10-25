@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CartsService } from './carts.service';
@@ -31,9 +32,21 @@ export class CartsController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getCarts(@CurrentUser() user: TokenPayload) {
-    const getCart = await this.cartsService.getCarts(user.userId);
-    return { message: 'Get Data Success', data: getCart };
+  async getCarts(
+    @CurrentUser() user: TokenPayload,
+    @Query('page') page: number = 1,
+  ) {
+    const { currentPage, totalPages, totalProducts, carts } =
+      await this.cartsService.getCarts({ page, userId: user.userId });
+    return {
+      message: 'Get Data Success',
+      pagination: {
+        currentPage,
+        totalPages,
+        totalProducts,
+      },
+      data: carts,
+    };
   }
 
   @Patch(':cartId')

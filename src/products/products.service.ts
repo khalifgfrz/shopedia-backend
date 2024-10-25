@@ -42,14 +42,15 @@ export class ProductsService {
     }
   }
 
+  // service
   async getProducts({
     page,
-    categoryId,
+    categoryNames, // Accept an array of category names
     sort,
     search,
   }: {
     page: number;
-    categoryId?: string;
+    categoryNames?: string[]; // Update to accept an array of category names
     sort?: 'asc' | 'desc' | 'latest' | 'oldest';
     search?: string;
   }) {
@@ -58,7 +59,10 @@ export class ProductsService {
 
     const where: Prisma.ProductWhereInput = {
       is_deleted: false,
-      ...(categoryId && { categories: { some: { id: +categoryId } } }),
+      ...(categoryNames &&
+        categoryNames.length > 0 && {
+          categories: { some: { name: { in: categoryNames } } }, // Use 'in' to filter by multiple category names
+        }),
       ...(search && { name: { contains: search, mode: 'insensitive' } }),
     };
 
@@ -89,10 +93,18 @@ export class ProductsService {
       include: { categories: true },
     });
 
-    return products.map((product) => ({
-      ...product,
-      categories: product.categories.map((category) => category.name),
-    }));
+    const totalProducts = await this.prismaService.product.count({ where });
+    const totalPages = Math.ceil(totalProducts / take);
+
+    return {
+      currentPage: page,
+      totalPages,
+      totalProducts,
+      products: products.map((product) => ({
+        ...product,
+        categories: product.categories.map((category) => category.name),
+      })),
+    };
   }
 
   async getProduct(productId: string) {

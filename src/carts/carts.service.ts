@@ -39,18 +39,50 @@ export class CartsService {
     };
   }
 
-  async getCarts(userId: number) {
+  async getCarts({ page, userId }: { page: number; userId: number }) {
+    const take = 10;
+    const skip = (page - 1) * take;
+
+    const where = { userId: userId };
+
     try {
       const carts = await this.prismaService.cart.findMany({
-        where: { userId: userId },
+        where,
+        take,
+        skip,
+        include: {
+          product: {
+            select: {
+              name: true,
+              image: true,
+              description: true,
+            },
+          },
+        },
       });
+
       if (carts.length === 0) {
         throw new NotFoundException('No products found for this user');
       }
 
-      return carts.map((cart) => ({
-        ...cart,
-      }));
+      const totalProducts = await this.prismaService.cart.count({ where });
+      const totalPages = Math.ceil(totalProducts / take);
+
+      return {
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        carts: carts.map((cart) => ({
+          id: cart.id,
+          userId: cart.userId,
+          productId: cart.productId,
+          productName: cart.product?.name || 'N/A',
+          productImage: cart.product?.image || 'N/A',
+          productDescription: cart.product?.description || 'N/A',
+          qty: cart.qty,
+          price: cart.price,
+        })),
+      };
     } catch (err) {
       throw new NotFoundException('Product not found');
     }

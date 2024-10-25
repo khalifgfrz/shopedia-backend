@@ -35,15 +35,10 @@ export class AuthService {
       role: user.role,
       createdAt: user.created_at,
     };
+
     const token = this.jwtService.sign(tokenPayload);
 
-    response.cookie('Authentication', token, {
-      secure: true,
-      httpOnly: true,
-      expires,
-    });
-
-    return { message: 'Login Success', tokenPayload };
+    return { message: 'Login Success', token };
   }
 
   async verifyUser(email: string, password: string) {

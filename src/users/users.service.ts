@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -22,6 +23,8 @@ export class UsersService {
     try {
       const randomUsername = `user${Math.floor(Math.random() * 1000000000)}`;
 
+      console.log({ data });
+
       const user = await this.prismaService.user.create({
         data: {
           ...data,
@@ -38,6 +41,7 @@ export class UsersService {
         },
       });
 
+      console.log(user);
       return user;
     } catch (err) {
       console.error(err);
