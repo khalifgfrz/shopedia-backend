@@ -15,7 +15,7 @@ async function bootstrap() {
     methods: '*',
     credentials: true,
   });
-  await app.listen(app.get(ConfigService).getOrThrow('PORT'));
+  await app.listen(process.env.PORT || 3001);
 }
 bootstrap();
 
