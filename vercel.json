@@ -4,7 +4,7 @@
   "buildCommand": "pnpm build",
   "functions": {
     "api/**/*.ts": {
-      "runtime": "nodejs16.x"
+      "runtime": "nodejs20.x"
     }
   },
   "outputDirectory": "dist",
